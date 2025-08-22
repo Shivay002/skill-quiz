@@ -1,0 +1,48 @@
+# ----------------------
+# Node.js + Express backend
+# ----------------------
+backend/node_modules/
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+backend/logs
+backend/*.log
+backend/*.pid
+backend/coverage/
+backend/.tmp/
+backend/dist/
+backend/build/
+backend/.cache/
+backend/.temp/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# ----------------------
+# React frontend
+# ----------------------
+skill-portal-frontend/node_modules/
+skill-portal-frontend/dist/
+skill-portal-frontend/build/
+skill-portal-frontend/.cache/
+skill-portal-frontend/.temp/
+skill-portal-frontend/.env
+skill-portal-frontend/.env.local
+skill-portal-frontend/.env.*.local
+skill-portal-frontend/coverage/
+
+# ----------------------
+# OS / IDE files
+# ----------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+
+# ----------------------
+# Misc
+# ----------------------
+*.swp
+*.swo

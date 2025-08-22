@@ -1,0 +1,270 @@
+{
+    "info": {
+        "name": "Skill Assessment API (Localhost)",
+        "_postman_id": "8c3b4c1f-1234-5678-9abc-def123456789",
+        "description": "Collection for Skill Assessment & Reporting Portal (localhost setup)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": "{{baseUrl}}/auth/register"
+                    }
+                },
+                {
+                    "name": "Login User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": "{{baseUrl}}/auth/login"
+                    }
+                },
+                {
+                    "name": "Login Admin",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpass\"\n}"
+                        },
+                        "url": "{{baseUrl}}/auth/login"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Get All Users (with pagination & filter)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/users?page=1&limit=10&role=user&search=john"
+                    }
+                },
+                {
+                    "name": "Create User (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"user\"\n}"
+                        },
+                        "url": "{{baseUrl}}/users"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Skills",
+            "item": [
+                {
+                    "name": "Create Skill",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"JavaScript\",\n  \"description\": \"Frontend + Backend JS\"\n}"
+                        },
+                        "url": "{{baseUrl}}/skills"
+                    }
+                },
+                {
+                    "name": "Get All Skills (with pagination & search)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/skills?page=1&limit=10&search=Java"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Questions",
+            "item": [
+                {
+                    "name": "Create Question",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"text\": \"What is closure in JS?\",\n  \"options\": [\"Scope function\", \"Encapsulation\", \"Inheritance\", \"None\"],\n  \"correctAnswer\": 0,\n  \"skillId\": 1\n}"
+                        },
+                        "url": "{{baseUrl}}/questions"
+                    }
+                },
+                {
+                    "name": "Get Questions (with skill & pagination)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/questions?skillId=1&page=1&limit=5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Quiz Attempts",
+            "item": [
+                {
+                    "name": "Create Quiz Attempt",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"skillId\": 1,\n  \"answers\": [\n    { \"questionId\": 1, \"selectedAnswer\": 0 },\n    { \"questionId\": 2, \"selectedAnswer\": 2 }\n  ]\n}"
+                        },
+                        "url": "{{baseUrl}}/quiz-attempts"
+                    }
+                },
+                {
+                    "name": "Get User Quiz Attempts",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/quiz-attempts/user?page=1&limit=10"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Reports",
+            "item": [
+                {
+                    "name": "User Performance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/reports/user"
+                    }
+                },
+                {
+                    "name": "Skill Gap (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/reports/skill-gap"
+                    }
+                },
+                {
+                    "name": "Time Report (Weekly/Monthly)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/reports/time?startDate=2025-08-01&endDate=2025-08-20&groupBy=week"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://<your-railway-domain>.up.railway.app/api"
+        },
+        {
+            "key": "userToken",
+            "value": ""
+        },
+        {
+            "key": "adminToken",
+            "value": ""
+        }
+    ]
+}
