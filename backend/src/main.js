@@ -35,7 +35,7 @@ app.get("/health", (req, res) => res.json({ status: "OK" }));
   try {
     await connectDB();
     console.log("✅ Database connection established");
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: false });
     console.log("✅ All models synchronized with DB");
 
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

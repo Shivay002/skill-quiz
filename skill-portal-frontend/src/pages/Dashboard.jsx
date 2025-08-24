@@ -10,6 +10,9 @@ export default function Dashboard() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // ✅ pagination state
+  const skillsPerPage = 6; // ✅ number of skills per page
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,6 +65,20 @@ export default function Dashboard() {
     setAnswers({ ...answers, [questionId]: value });
   }
 
+  // ✅ Pagination helpers
+  const indexOfLastSkill = currentPage * skillsPerPage;
+  const indexOfFirstSkill = indexOfLastSkill - skillsPerPage;
+  const currentSkills = skills.slice(indexOfFirstSkill, indexOfLastSkill);
+  const totalPages = Math.ceil(skills.length / skillsPerPage);
+
+  function handleNextPage() {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  }
+
+  function handlePrevPage() {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  }
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       {/* ==== HEADER ==== */}
@@ -89,7 +106,7 @@ export default function Dashboard() {
           {/* Skills Section */}
           <h2 className="text-xl font-semibold mb-4">Available Skills Test</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {skills.map((skill) => (
+            {currentSkills.map((skill) => (
               <div
                 key={skill.id}
                 className="border rounded-lg p-4 shadow-sm flex flex-col items-center bg-white hover:shadow-md transition"
@@ -104,6 +121,29 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+
+          {/* ✅ Pagination Controls */}
+          {skills.length > skillsPerPage && (
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="self-center">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </>
       )}
 
