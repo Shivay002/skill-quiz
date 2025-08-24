@@ -35,12 +35,11 @@ export async function paginateQuestions(query) {
   if (query.skillId) {
     where.skillId = parseInt(query.skillId, 10);
   }
-
   const { rows, count } = await Question.findAndCountAll({
     where,
     limit,
     offset,
-    order: [["createdAt", "DESC"]],
+    order: [["createdAt", "ASC"]],
     include: [{ model: Skill }],
   });
   const plainRows = JSON.parse(JSON.stringify(rows));
@@ -72,4 +71,3 @@ export async function paginateQuestions(query) {
     limit,
   };
 }
-

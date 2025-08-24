@@ -1,7 +1,7 @@
 import * as service from "../services/quiz.service.js";
 
 export async function createAttempt(req, res) {
-  try {
+  try {    
     const attempt = await service.createAttempt(
       req.user.id,
       req.body.skillId,

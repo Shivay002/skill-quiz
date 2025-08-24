@@ -17,24 +17,35 @@ export async function getUserPerformance(userId, query) {
   return { rows, count, page, limit };
 }
 
-export async function getSkillAverages() {
-  return QuizAttempt.findAll({
+export async function getSkillAverages(userId) {
+  const where = {};
+  if (userId) where.userId = userId;
+  const response = await QuizAttempt.findAll({
+    where,
     attributes: [
       "skillId",
-      [QuizAttempt.sequelize.fn("AVG", QuizAttempt.sequelize.col("score")), "avgScore"],
+      [
+        QuizAttempt.sequelize.fn("AVG", QuizAttempt.sequelize.col("score")),
+        "avgScore",
+      ],
     ],
     group: ["skillId"],
     include: [{ model: Skill, attributes: ["id", "name"] }],
   });
+  return JSON.parse(JSON.stringify(response));
 }
 
 export async function findAttemptsByDateRange(userId, startDate, endDate) {
   const where = { createdAt: { [Op.between]: [startDate, endDate] } };
   if (userId) where.userId = userId;
 
-  return await QuizAttempt.findAll({
-    where,
-    include: [{ model: Skill }],
-    order: [["createdAt", "DESC"]],
-  });
+  return JSON.parse(
+    JSON.stringify(
+      await QuizAttempt.findAll({
+        where,
+        include: [{ model: Skill, attributes: ["id", "name"] }],
+        order: [["createdAt", "DESC"]],
+      })
+    )
+  );
 }
