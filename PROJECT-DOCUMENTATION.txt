@@ -1,0 +1,82 @@
+Skill‑Quiz Application – API & Flow Documentation
+
+1. Overview
+Skill‑Quiz is a full‑stack application for administering skill‑based quizzes, tracking user performance, and generating analytics reports.
+It consists of:
+- Frontend: React SPA (user & admin interfaces)
+- Backend: Node.js + Express + Sequelize
+- Database: MySQL (hosted on Railway)
+
+2. User Roles
+- Admin:
+  • Manage skills & questions (CRUD)
+  • View user reports & performance metrics
+  • Generate analytics
+- User:
+  • Take quizzes by skill
+  • View attempts history
+  • View personal performance dashboard
+
+3. Core Modules
+1. Authentication
+   - Register
+   - Login
+   - Role‑based access
+2. Skills Management
+   - Add/Edit/Delete skills
+   - List skills
+3. Questions Management
+   - Add/Edit/Delete questions under a skill
+   - View questions per skill
+4. Quizzes
+   - Start quiz for selected skill
+   - Submit quiz answers
+   - Calculate and store score
+5. Reports
+   - Time‑based report (week, month, custom)
+   - Skill gap report
+   - User performance report (admin view)
+
+4. API Endpoints
+Auth
+POST /api/auth/register — Create a new user
+POST /api/auth/login — Login and get token
+
+Skills
+GET /api/skills — Get all skills
+POST /api/skills — Add skill (Admin)
+PUT /api/skills/:id — Edit skill (Admin)
+DELETE /api/skills/:id — Delete skill (Admin)
+
+Questions
+GET /api/questions?skillId={id} — Get questions for a skill (Admin)
+POST /api/questions — Add question (Admin)
+PUT /api/questions/:id — Update question (Admin)
+DELETE /api/questions/:id — Delete question (Admin)
+
+Quizzes
+POST /api/quiz/start/:skillId — Start quiz for skill
+POST /api/quiz/submit/:quizId — Submit quiz answers
+
+Reports
+GET /api/reports/time?filter={week|month|custom}&from=YYYY-MM-DD&to=YYYY-MM-DD — Time‑based attempts
+GET /api/reports/skill-gap — Skill gap analysis
+GET /api/reports/user/:id — User performance report (Admin)
+
+5. Data Flow
+
+Frontend User Flow
+User → Login/Register → Select Skill → Start Quiz → Submit Answers → View Score
+
+Frontend Admin Flow
+Admin → Login → Manage Skills/Questions → View Reports → Drill‑down into User Performance
+
+System Flow
+Frontend → (API request with JWT) → Backend (Express routes) → Sequelize ORM → MySQL (Railway)
+
+6. Database Structure (Core Tables)
+users (id, name, email, password, role, createdAt, updatedAt)
+skills (id, name, description, createdAt, updatedAt)
+questions (id, text, options [JSON], correctOption, difficulty, skillId)
+quiz_attempts (id, userId, skillId, score, totalQuestions, correctAnswers, createdAt)
+quiz_answers (id, attemptId, questionId, selectedOption, isCorrect)

@@ -9,10 +9,8 @@ export async function startQuiz(skillId) {
   const res = await axiosInstance.get("/questions/list", {
     params: { skillId },
   });
-  return {
-    skillId,
-    questions: res.data || [],
-  };
+  const questions = res.data?.data?.details[0].questions || [];
+  return { skillId, questions };
 }
 
 export async function submitQuiz(quizId, answers) {
@@ -20,11 +18,14 @@ export async function submitQuiz(quizId, answers) {
   return res.data;
 }
 
-export async function fetchUserAttempts() {
-  const res = await axiosInstance.get("/quiz/attempts");
-  return res.data;
+export function submitAttempt({ skillId, answers }) {
+  return axiosInstance.post("/quiz", { skillId, answers });
 }
 
-export function submitAttempt({ skillId, submittedAnswers }) {
-  return axiosInstance.post("/quiz", { skillId, submittedAnswers });
+export function fetchUserAttempts(params) {
+  return axiosInstance.get("/reports/user", { params });
+}
+
+export function getAttemptById(id) {
+  return axiosInstance.get(`/quiz/${id}`);
 }

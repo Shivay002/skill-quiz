@@ -3,6 +3,7 @@ import { useState } from "react";
 import LogoutButton from "../components/LogoutButton";
 import ManageQuestions from "./admin/ManageQuestions";
 import UserReports from "./admin/Reports";
+import PerformancePage from "./PerformancePage";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("questions");
@@ -14,9 +15,7 @@ export default function AdminDashboard() {
       <div className="flex justify-center space-x-4 mb-8">
         <button
           className={`px-4 py-2 rounded ${
-            activeTab === "questions"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200"
+            activeTab === "questions" ? "bg-blue-600 text-white" : "bg-gray-200"
           }`}
           onClick={() => setActiveTab("questions")}
         >
@@ -30,10 +29,21 @@ export default function AdminDashboard() {
         >
           User Reports
         </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            activeTab === "performance"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200"
+          }`}
+          onClick={() => setActiveTab("performance")}
+        >
+          Performance
+        </button>
       </div>
 
       {activeTab === "questions" && <ManageQuestions />}
       {activeTab === "reports" && <UserReports />}
+      {activeTab === "performance" && <PerformancePage />}
     </div>
   );
 }

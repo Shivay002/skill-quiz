@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
-    createQuestion,
-    deleteQuestion,
-    getAllQuestions,
-    updateQuestion,
+  createQuestion,
+  deleteQuestion,
+  getAllQuestions,
+  updateQuestion,
 } from "../../services/questionService";
 import { getAllSkills } from "../../services/skillService";
 
@@ -15,13 +15,15 @@ export default function ManageQuestions() {
   const [formData, setFormData] = useState({
     text: "",
     skillId: "",
-    options: "",
-    answer: "",
+    option1: "",
+    option2: "",
+    option3: "",
+    option4: "",
+    correctOption: null,
   });
   const [editId, setEditId] = useState(null);
   const [showFormForSkill, setShowFormForSkill] = useState(null);
 
-  // Load all skills
   async function loadSkills() {
     try {
       const { data } = await getAllSkills();
@@ -31,17 +33,20 @@ export default function ManageQuestions() {
     }
   }
 
-async function loadQuestions(skillId) {
-  try {
-    const { data } = await getAllQuestions({ skillId });
-    const skillsArr = data.data || [];
-    const questionsForSkill = skillsArr.find(s => s.skillId === skillId)?.questions || [];
-    setQuestionsBySkill(prev => ({ ...prev, [skillId]: questionsForSkill }));
-  } catch {
-    toast.error("Failed to load questions");
+  async function loadQuestions(skillId) {
+    try {
+      const { data } = await getAllQuestions({ skillId });
+      const questionsForSkill = data.data.details
+        ? data.data.details[0].questions
+        : [];
+      setQuestionsBySkill((prev) => ({
+        ...prev,
+        [skillId]: questionsForSkill,
+      }));
+    } catch {
+      toast.error("Failed to load questions");
+    }
   }
-}
-
 
   useEffect(() => {
     loadSkills();
@@ -64,24 +69,38 @@ async function loadQuestions(skillId) {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!formData.text || !formData.skillId || !formData.options || !formData.answer) {
+    if (
+      !formData.text ||
+      !formData.skillId ||
+      !formData.option1 ||
+      !formData.option2 ||
+      !formData.option3 ||
+      !formData.option4
+    ) {
       toast.error("All fields are required");
       return;
     }
+    const optionsArray = [
+      formData.option1.trim(),
+      formData.option2.trim(),
+      formData.option3.trim(),
+      formData.option4.trim(),
+    ];
 
-    const optionsArray = formData.options.split(",").map((o) => o.trim());
-    const answerIndex = optionsArray.indexOf(formData.answer.trim());
-
-    if (answerIndex === -1) {
-      toast.error("Correct answer must match one of the options");
+    if (optionsArray.some((o) => !o)) {
+      toast.error("All 4 options are required");
       return;
     }
 
+    if (formData.correctOption === null) {
+      toast.error("Please select the correct option");
+      return;
+    }
     const payload = {
       text: formData.text.trim(),
       skillId: formData.skillId,
       options: optionsArray,
-      correctOption: answerIndex,
+      correctOption: formData.correctOption,
     };
 
     try {
@@ -102,10 +121,14 @@ async function loadQuestions(skillId) {
   function handleEdit(skillId, q) {
     setFormData({
       text: q.text,
-      skillId: skillId,
-      options: q.options.join(", "),
-      answer: q.options[q.correctOption] || "",
+      skillId,
+      option1: q.options[0] || "",
+      option2: q.options[1] || "",
+      option3: q.options[2] || "",
+      option4: q.options[3] || "",
+      correctOption: q.correctOption,
     });
+
     setEditId(q.id);
     setShowFormForSkill(skillId);
   }
@@ -139,7 +162,7 @@ async function loadQuestions(skillId) {
           </tr>
         </thead>
         <tbody>
-          {skills.map(skill => (
+          {skills.map((skill) => (
             <>
               <tr
                 key={skill.id}
@@ -185,21 +208,29 @@ async function loadQuestions(skillId) {
                           questionsBySkill[skill.id].map((q) => (
                             <tr key={q.id}>
                               <td className="border p-2">{q.text}</td>
-                              <td className="border p-2">{q.options.join(", ")}</td>
-                              <td className="border p-2">{q.options[q.correctOption]}</td>
+                              <td className="border p-2">
+                                {q.options.join(", ")}
+                              </td>
+                              <td className="border p-2">
+                                {q.options[q.correctOption]}
+                              </td>
                               <td className="border p-2 space-x-2">
-                                <button
-                                  onClick={() => handleEdit(skill.id, q)}
-                                  className="bg-yellow-500 text-white px-3 py-1 rounded"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(skill.id, q.id)}
-                                  className="bg-red-500 text-white px-3 py-1 rounded"
-                                >
-                                  Delete
-                                </button>
+                                <div className="flex gap-2 justify-center">
+                                  <button
+                                    onClick={() => handleEdit(skill.id, q)}
+                                    className="flex items-center gap-1 px-2 py-1 text-xs border border-yellow-500 text-yellow-600 rounded hover:bg-yellow-50 transition"
+                                    title="Edit question"
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(skill.id, q.id)}
+                                    className="flex items-center gap-1 px-2 py-1 text-xs border border-red-500 text-red-600 rounded hover:bg-red-50 transition"
+                                    title="Delete question"
+                                  >
+                                    🗑 Delete
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))
@@ -224,24 +255,42 @@ async function loadQuestions(skillId) {
                           onChange={handleChange}
                           className="border p-2 w-full"
                         />
-                        <input
-                          type="text"
-                          name="options"
-                          placeholder="Options (comma separated)"
-                          value={formData.options}
-                          onChange={handleChange}
-                          className="border p-2 w-full"
-                        />
-                        <input
-                          type="text"
-                          name="answer"
-                          placeholder="Correct Answer"
-                          value={formData.answer}
-                          onChange={handleChange}
-                          className="border p-2 w-full"
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {[0, 1, 2, 3].map((idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name="correctOption"
+                                value={idx}
+                                checked={formData.correctOption === idx}
+                                onChange={() =>
+                                  setFormData({
+                                    ...formData,
+                                    correctOption: idx,
+                                  })
+                                }
+                              />
+                              <input
+                                type="text"
+                                placeholder={`Option ${idx + 1}`}
+                                value={formData[`option${idx + 1}`] || ""}
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    [`option${idx + 1}`]: e.target.value,
+                                  })
+                                }
+                                className="border p-2 w-full"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
                         <div>
-                          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                          <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                          >
                             {editId ? "Update Question" : "Add Question"}
                           </button>
                           <button
