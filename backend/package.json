@@ -4,25 +4,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/main.js",
-    "start": "node src/main.js",
-    "test": "set NODE_OPTIONS=--experimental-vm-modules && jest --detectOpenHandles --runInBand"
+    "start": "node src/main.js"
   },
   "type": "module",
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {},
-    "reporters": [
-      "default",
-      [
-        "jest-html-reporter",
-        {
-          "pageTitle": "Backend Test Report",
-          "outputPath": "./tests/test-report.html",
-          "includeFailureMsg": true
-        }
-      ]
-    ]
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
