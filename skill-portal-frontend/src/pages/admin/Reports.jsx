@@ -13,11 +13,23 @@ import toast from "react-hot-toast";
 import { getUserReport } from "../../services/reportService";
 import { getAllUsers } from "../../services/userService";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend
+);
 
 export default function Reports() {
   const [users, setUsers] = useState([]);
-  const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0, limit: 10 });
+  const [meta, setMeta] = useState({
+    page: 1,
+    totalPages: 1,
+    total: 0,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
 
   const [expandedUserId, setExpandedUserId] = useState(null);
@@ -30,7 +42,9 @@ export default function Reports() {
       setLoading(true);
       const { data } = await getAllUsers({ page, limit: meta.limit });
       setUsers(data?.data || []);
-      setMeta(data?.meta || { page: 1, totalPages: 1, total: 0, limit: meta.limit });
+      setMeta(
+        data?.meta || { page: 1, totalPages: 1, total: 0, limit: meta.limit }
+      );
     } catch {
       toast.error("Failed to load users");
     } finally {
@@ -49,13 +63,13 @@ export default function Reports() {
   }
 
   async function toggleUser(userId) {
-    setExpandedUserId(prev => (prev === userId ? null : userId));
+    setExpandedUserId((prev) => (prev === userId ? null : userId));
     // If opening and not cached, fetch page 1
     if (!reportsCache[userId]) {
       try {
         setReportLoading(true);
         const data = await fetchUserReport(userId, 1, 10);
-        setReportsCache(prev => ({ ...prev, [userId]: data }));
+        setReportsCache((prev) => ({ ...prev, [userId]: data }));
       } catch {
         toast.error("Failed to load user report");
       } finally {
@@ -68,7 +82,7 @@ export default function Reports() {
     try {
       setReportLoading(true);
       const data = await fetchUserReport(userId, page, 10);
-      setReportsCache(prev => ({ ...prev, [userId]: data }));
+      setReportsCache((prev) => ({ ...prev, [userId]: data }));
     } catch {
       toast.error("Failed to paginate user report");
     } finally {
@@ -77,16 +91,16 @@ export default function Reports() {
   }
 
   function buildChartData(attempts) {
-    // Sort by createdAt ascending for a clean trend line
     const sorted = [...attempts].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
     return {
-      labels: sorted.map(a => new Date(a.createdAt).toLocaleDateString()),
+      labels: sorted.map((a) => new Date(a.createdAt).toLocaleDateString()),
       datasets: [
         {
           label: "Score",
-          data: sorted.map(a => a.score),
+          data: sorted.map((a) => a.score),
           borderColor: "rgb(59,130,246)",
           backgroundColor: "rgba(59,130,246,0.4)",
           tension: 0.3,
@@ -100,7 +114,10 @@ export default function Reports() {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: true }, tooltip: { mode: "index", intersect: false } },
+    plugins: {
+      legend: { display: true },
+      tooltip: { mode: "index", intersect: false },
+    },
     scales: {
       y: { beginAtZero: true, ticks: { stepSize: 10 } },
     },
@@ -125,11 +142,19 @@ export default function Reports() {
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan={4} className="border p-4 text-center">Loading users…</td></tr>
+            <tr>
+              <td colSpan={4} className="border p-4 text-center">
+                Loading users…
+              </td>
+            </tr>
           ) : users.length === 0 ? (
-            <tr><td colSpan={4} className="border p-4 text-center">No users found</td></tr>
+            <tr>
+              <td colSpan={4} className="border p-4 text-center">
+                No users found
+              </td>
+            </tr>
           ) : (
-            users.map(u => {
+            users.map((u) => {
               const isOpen = expandedUserId === u.id;
               const report = reportsCache[u.id]; // { data, meta }
               const attempts = report?.data || [];
@@ -138,7 +163,9 @@ export default function Reports() {
               const totalAttempts = attempts.length;
               const avgScore = totalAttempts
                 ? Math.round(
-                    (attempts.reduce((sum, a) => sum + (a.score || 0), 0) / totalAttempts) * 10
+                    (attempts.reduce((sum, a) => sum + (a.score || 0), 0) /
+                      totalAttempts) *
+                      10
                   ) / 10
                 : 0;
 
@@ -150,7 +177,11 @@ export default function Reports() {
                     <td className="border p-2 capitalize">{u.role}</td>
                     <td className="border p-2 text-center">
                       <button
-                        className={`px-3 py-1 rounded ${isOpen ? "bg-gray-500 text-white" : "bg-blue-500 text-white"}`}
+                        className={`px-3 py-1 rounded ${
+                          isOpen
+                            ? "bg-gray-500 text-white"
+                            : "bg-blue-500 text-white"
+                        }`}
                         onClick={() => toggleUser(u.id)}
                       >
                         {isOpen ? "Hide" : "View"} Report
@@ -164,7 +195,9 @@ export default function Reports() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="text-sm">
                             <span className="font-semibold mr-2">Summary:</span>
-                            <span className="mr-3">Attempts: {totalAttempts}</span>
+                            <span className="mr-3">
+                              Attempts: {totalAttempts}
+                            </span>
                             <span className="mr-3">Avg Score: {avgScore}</span>
                           </div>
                           {rMeta && (
@@ -175,38 +208,85 @@ export default function Reports() {
                         </div>
 
                         {reportLoading && attempts.length === 0 ? (
-                          <div className="p-3 text-sm text-gray-600">Loading report…</div>
+                          <div className="p-3 text-sm text-gray-600">
+                            Loading report…
+                          </div>
                         ) : attempts.length === 0 ? (
-                          <div className="p-3 text-sm text-gray-600">No attempts found for this user</div>
+                          <div className="p-3 text-sm text-gray-600">
+                            No attempts found for this user
+                          </div>
                         ) : (
                           <div>
                             <div className="mb-4" style={{ height: 240 }}>
-                              <Line data={buildChartData(attempts)} options={chartOptions} />
+                              <Line
+                                data={buildChartData(attempts)}
+                                options={chartOptions}
+                              />
                             </div>
 
                             <div className="overflow-x-auto">
                               <table className="table-auto border-collapse border border-gray-300 w-full mb-3">
                                 <thead>
                                   <tr className="bg-gray-200">
-                                    <th className="border p-2 text-left">Date</th>
-                                    <th className="border p-2 text-left">Skill</th>
-                                    <th className="border p-2 text-left">Score</th>
-                                    <th className="border p-2 text-left">Time</th>
+                                    <th className="border p-2 text-left">
+                                      Date
+                                    </th>
+                                    <th className="border p-2 text-left">
+                                      Skill
+                                    </th>
+                                    <th className="border p-2 text-left">
+                                      Score
+                                    </th>
+                                    <th className="border p-2 text-left">
+                                      Time
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {attempts.map((a) => (
-                                    <tr key={a.id ?? `${a.skillId}-${a.createdAt}`}>
-                                      <td className="border p-2">
-                                        {new Date(a.createdAt).toLocaleString()}
-                                      </td>
-                                      <td className="border p-2">
-                                        {a.Skill?.name || a.skill?.name || a.skillId}
-                                      </td>
-                                      <td className="border p-2">{a.score}</td>
-                                      <td className="border p-2">{a.duration ? `${a.duration} sec` : "-"}</td>
-                                    </tr>
-                                  ))}
+                                  {attempts.map((a) => {
+                                    const created = new Date(a.createdAt);
+
+                                    const dateStr = created.toLocaleDateString(
+                                      "en-GB",
+                                      {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
+                                      }
+                                    );
+
+                                    const timeStr = created.toLocaleTimeString(
+                                      "en-GB",
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit",
+                                      }
+                                    );
+
+                                    return (
+                                      <tr
+                                        key={
+                                          a.id ?? `${a.skillId}-${a.createdAt}`
+                                        }
+                                      >
+                                        <td className="border p-2">
+                                          {dateStr}
+                                        </td>
+                                        <td className="border p-2">
+                                          {a.Skill?.name ||
+                                            a.skill?.name ||
+                                            a.skillId}
+                                        </td>
+                                        <td className="border p-2">
+                                          {a.score}
+                                        </td>
+                                        <td className="border p-2">
+                                          {timeStr}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
                                 </tbody>
                               </table>
                             </div>
@@ -218,14 +298,20 @@ export default function Reports() {
                             <button
                               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
                               disabled={rMeta.page <= 1 || reportLoading}
-                              onClick={() => loadMoreReport(u.id, rMeta.page - 1)}
+                              onClick={() =>
+                                loadMoreReport(u.id, rMeta.page - 1)
+                              }
                             >
                               Prev
                             </button>
                             <button
                               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                              disabled={rMeta.page >= rMeta.totalPages || reportLoading}
-                              onClick={() => loadMoreReport(u.id, rMeta.page + 1)}
+                              disabled={
+                                rMeta.page >= rMeta.totalPages || reportLoading
+                              }
+                              onClick={() =>
+                                loadMoreReport(u.id, rMeta.page + 1)
+                              }
                             >
                               Next
                             </button>
@@ -249,7 +335,9 @@ export default function Reports() {
         >
           Prev
         </button>
-        <span className="text-sm">Page {meta.page} of {meta.totalPages}</span>
+        <span className="text-sm">
+          Page {meta.page} of {meta.totalPages}
+        </span>
         <button
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           disabled={meta.page >= meta.totalPages || loading}

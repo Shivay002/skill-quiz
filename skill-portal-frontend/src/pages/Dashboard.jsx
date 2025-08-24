@@ -1,37 +1,29 @@
 // src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
-import {
-  fetchSkills,
-  fetchUserAttempts,
-  startQuiz,
-  submitQuiz,
-} from "../services/quizService";
+import { fetchSkills, startQuiz, submitQuiz } from "../services/quizService";
 
 export default function Dashboard() {
   const [skills, setSkills] = useState([]);
-  const [attempts, setAttempts] = useState([]);
-  const [selectedSkill, setSelectedSkill] = useState(null);
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadData();
+    loadSkills();
   }, []);
 
-  async function loadData() {
+  async function loadSkills() {
     try {
       setLoading(true);
       setError("");
       const skillsRes = await fetchSkills();
       setSkills(skillsRes.data || skillsRes);
-
-      const attemptsRes = await fetchUserAttempts();
-      setAttempts(attemptsRes.data || attemptsRes);
     } catch (err) {
-      setError("⚠️ Failed to load data. Try again later.");
+      setError("⚠️ Failed to load skills. Try again later.");
     } finally {
       setLoading(false);
     }
@@ -41,11 +33,11 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const { questions } = await startQuiz(skillId);
-
       navigate(`/quiz/${skillId}`, {
-        state: { skillId, questions: questions.data },
+        state: { skillId, questions },
       });
-    } catch {
+    } catch (err) {
+      console.error("Failed to start quiz:", err);
       setError("⚠️ Failed to start quiz.");
     } finally {
       setLoading(false);
@@ -58,8 +50,7 @@ export default function Dashboard() {
       const res = await submitQuiz(quiz.id, answers);
       alert("✅ Quiz submitted! Score: " + res.score);
       setQuiz(null);
-      setSelectedSkill(null);
-      loadData();
+      loadSkills();
     } catch {
       setError("⚠️ Failed to submit quiz.");
     } finally {
@@ -73,16 +64,31 @@ export default function Dashboard() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">User Dashboard</h1>
-      <LogoutButton />
+      {/* ==== HEADER ==== */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">User Dashboard</h1>
+
+        {/* Action buttons right-aligned */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate("/attempts-history")}
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900 transition"
+          >
+            View Attempts History
+          </button>
+          <LogoutButton />
+        </div>
+      </div>
+
       {loading && <p className="text-blue-600 text-center">Loading...</p>}
       {error && <p className="text-red-600 text-center">{error}</p>}
 
+      {/* ======== MAIN VIEW ======== */}
       {!loading && !quiz && (
         <>
           {/* Skills Section */}
-          <h2 className="text-xl font-semibold mb-4">Available Skills</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Available Skills Test</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {skills.map((skill) => (
               <div
                 key={skill.id}
@@ -98,40 +104,10 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-
-          {/* Past Attempts Section */}
-          <h2 className="text-xl font-semibold mb-4">Past Attempts</h2>
-          {attempts.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-200 shadow-sm bg-white">
-                <thead>
-                  <tr className="bg-gray-100 text-left">
-                    <th className="border p-3">Skill</th>
-                    <th className="border p-3">Score</th>
-                    <th className="border p-3">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attempts.map((attempt) => (
-                    <tr key={attempt.id} className="hover:bg-gray-50">
-                      <td className="border p-3">{attempt.skill?.name}</td>
-                      <td className="border p-3">{attempt.score}</td>
-                      <td className="border p-3">
-                        {attempt.date
-                          ? new Date(attempt.date).toLocaleString()
-                          : "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-gray-600">No past attempts found.</p>
-          )}
         </>
       )}
 
+      {/* ======== QUIZ IN-PROGRESS VIEW ======== */}
       {!loading && quiz && (
         <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-4">

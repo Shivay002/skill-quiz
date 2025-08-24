@@ -7,9 +7,12 @@ import {
 } from "react-router-dom";
 import UserReport from "../pages/admin/Reports.jsx";
 import AdminDashboard from "../pages/AdminDashboard.jsx";
+import AttemptDetailPage from "../pages/AttemptDetailPage.jsx";
+import AttemptsHistoryPage from "../pages/AttemptsHistoryPage.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Landing from "../pages/HomePage.jsx";
 import Login from "../pages/Login.jsx";
+import PerformancePage from "../pages/PerformancePage.jsx";
 import QuizPage from "../pages/QuizPage.jsx";
 import Register from "../pages/Register.jsx";
 import ReportsList from "../pages/ReportsList.jsx";
@@ -53,6 +56,9 @@ export default function AppRoutes() {
         <Route path="/reports" element={<ReportsList />} />
         <Route path="/reports/:userId" element={<UserReport />} />
         <Route path="/quiz/:skillId" element={<QuizPage />} />
+        <Route path="/attempt/:id" element={<AttemptDetailPage />} />
+        <Route path="/attempts-history" element={<AttemptsHistoryPage />} />
+        <Route path="/performance" element={<PerformancePage />} />
       </Routes>
     </Router>
   );
