@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { connectDB, sequelize } from "./config/db.js";
 // import authRoutes from "./routes/auth.routes.js";
 import questionRoutes from "./routes/questions.routes.js";
+import quizRouter from "./routes/quiz.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import skillRoutes from "./routes/skills.routes.js";
 import userRoutes from "./routes/users.routes.js";
@@ -26,18 +27,18 @@ app.use("/api/users", userRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/quiz", quizRouter);
 
 app.get("/health", (req, res) => res.json({ status: "OK" }));
 (async () => {
   try {
     await connectDB();
     console.log("✅ Database connection established");
-    await sequelize.sync({ alter: true }); 
+    await sequelize.sync({ alter: true });
     console.log("✅ All models synchronized with DB");
 
-    app.listen(PORT, () =>
-      console.log(`🚀 Server running on port ${PORT}`)
-    );
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   } catch (err) {
     console.error("❌ Failed to start server:", err);
     process.exit(1);

@@ -10,7 +10,7 @@ export async function createAttempt(data, answers) {
   for (const ans of answers) {
     await QuizAnswer.create({ ...ans, attemptId: attempt.id });
   }
-  return attempt;
+  return await findAttemptById(attempt.id);
 }
 
 export async function findAttemptById(id) {

@@ -17,11 +17,5 @@ router.post("/", createUser);
 router.put("/:id", authenticate, authorize("admin"), updateUser);
 router.delete("/:id", authenticate, authorize("admin"), deleteUser);
 router.post("/login", loginUser);
-// router.get("/", authenticate, getAllUsers);
-// router.get("/:id", authenticate, getUserById);
-// router.post("/", createUser);
-// router.put("/:id", authenticate, updateUser);
-// router.delete("/:id", authenticate, deleteUser);
-// router.post("/login", loginUser);
 
 export default router;

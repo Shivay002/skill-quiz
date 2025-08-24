@@ -1,7 +1,7 @@
 import Question from "../models/question.model.js";
 import * as repo from "../persistence/quiz.persistence.js";
 
-export async function createAttempt(userId, skillId, submittedAnswers) {
+export async function createAttempt(userId, skillId, submittedAnswers) {  
   const questionIds = submittedAnswers.map(a => a.questionId);
   const questions = await Question.findAll({ where: { id: questionIds } });
 
